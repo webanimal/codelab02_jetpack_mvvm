@@ -22,9 +22,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
 
@@ -34,8 +36,8 @@ import com.example.android.guesstheword.databinding.GameFragmentBinding
 class GameFragment : Fragment() {
 	
 	private val TAG = GameFragment::class.java.simpleName
-	private lateinit var viewModel: GameViewModel
 	private lateinit var binding: GameFragmentBinding
+	private lateinit var viewModel: GameViewModel
 	
 	override fun onAttach(context: Context) {
 		Log.i(TAG, "LIFECYCLE::onAttach")
@@ -49,16 +51,14 @@ class GameFragment : Fragment() {
 	): View {
 		Log.i(TAG, "LIFECYCLE::onCreateView")
 		
-		viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 		binding = DataBindingUtil.inflate(
 			inflater,
 			R.layout.game_fragment,
 			container,
 			false
 		)
-		
-		binding.correctButton.setOnClickListener { onCorrect() }
-		binding.skipButton.setOnClickListener { onSkip() }
+		setupViewModel()
+		setupListeners()
 		updateScoreText()
 		updateWordText()
 		
@@ -82,6 +82,10 @@ class GameFragment : Fragment() {
 		updateWordText()
 		updateScoreText()
 	}
+	
+	private fun onEndGame() {
+		finishGame()
+	}
 	// endregion
 	
 	// region Methods for updating the UI
@@ -91,6 +95,28 @@ class GameFragment : Fragment() {
 	
 	private fun updateScoreText() {
 		binding.scoreText.text = viewModel.score.toString()
+	}
+	// endregion
+	
+	// region Navigation
+	private fun finishGame() {
+		Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
+		GameFragmentDirections.actionGameToScore().let {
+			it.arguments.putInt("score", viewModel.score)
+			NavHostFragment.findNavController(this).navigate(it)
+		}
+	}
+	// endregion
+	
+	// region Prepare view
+	private fun setupViewModel() {
+		viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
+	}
+	
+	private fun setupListeners() {
+		binding.skipButton.setOnClickListener { onSkip() }
+		binding.correctButton.setOnClickListener { onCorrect() }
+		binding.endGameButton.setOnClickListener { onEndGame() }
 	}
 	// endregion
 }
