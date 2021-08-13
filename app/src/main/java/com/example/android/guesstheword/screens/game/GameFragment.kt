@@ -26,9 +26,10 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
+import com.example.android.guesstheword.screens.core.MyViewModelFactory
 
 /**
  * Fragment where the game is played
@@ -100,17 +101,18 @@ class GameFragment : Fragment() {
 	
 	// region Navigation
 	private fun finishGame() {
+		Log.i(TAG, "LIFECYCLE::finishGame finalScore:${viewModel.score}")
 		Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
-		GameFragmentDirections.actionGameToScore().let {
-			it.arguments.putInt("score", viewModel.score)
-			NavHostFragment.findNavController(this).navigate(it)
+		GameFragmentDirections.actionGameToScore(score = viewModel.score).let {
+			findNavController().navigate(it)
 		}
 	}
 	// endregion
 	
 	// region Prepare view
 	private fun setupViewModel() {
-		viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
+		viewModel = ViewModelProvider(this, MyViewModelFactory())
+			.get(GameViewModel::class.java)
 	}
 	
 	private fun setupListeners() {

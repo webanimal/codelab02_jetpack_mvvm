@@ -18,8 +18,8 @@ class GameViewModel : ViewModel() {
 	}
 	
 	override fun onCleared() {
-		super.onCleared()
 		Log.i(TAG, "LIFECYCLE::onCleared")
+		super.onCleared()
 	}
 	
 	// region Methods for buttons presses
