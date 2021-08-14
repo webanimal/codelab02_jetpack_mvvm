@@ -31,6 +31,11 @@ import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
 import com.example.android.guesstheword.screens.core.MyViewModelFactory
 
+/*
+* https://developer.android.com/codelabs/kotlin-android-training-live-data#3
+* https://medium.com/mobile-app-development-publication/injecting-viewmodel-with-dagger-hilt-54ca2e433865
+* */
+
 /**
  * Fragment where the game is played
  */
@@ -60,8 +65,6 @@ class GameFragment : Fragment() {
 		)
 		setupViewModel()
 		setupListeners()
-		updateScoreText()
-		updateWordText()
 		
 		return binding.root
 	}
@@ -74,14 +77,10 @@ class GameFragment : Fragment() {
 	// region Methods for buttons presses
 	private fun onSkip() {
 		viewModel.onSkip()
-		updateWordText()
-		updateScoreText()
 	}
 	
 	private fun onCorrect() {
 		viewModel.onCorrect()
-		updateWordText()
-		updateScoreText()
 	}
 	
 	private fun onEndGame() {
@@ -89,21 +88,11 @@ class GameFragment : Fragment() {
 	}
 	// endregion
 	
-	// region Methods for updating the UI
-	private fun updateWordText() {
-		binding.wordText.text = viewModel.word
-	}
-	
-	private fun updateScoreText() {
-		binding.scoreText.text = viewModel.score.toString()
-	}
-	// endregion
-	
 	// region Navigation
 	private fun finishGame() {
 		Log.i(TAG, "LIFECYCLE::finishGame finalScore:${viewModel.score}")
 		Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
-		GameFragmentDirections.actionGameToScore(score = viewModel.score).let {
+		GameFragmentDirections.actionGameToScore(score = viewModel.score.value ?: 0).let {
 			findNavController().navigate(it)
 		}
 	}
@@ -113,6 +102,12 @@ class GameFragment : Fragment() {
 	private fun setupViewModel() {
 		viewModel = ViewModelProvider(this, MyViewModelFactory())
 			.get(GameViewModel::class.java)
+		viewModel.score.observe(viewLifecycleOwner, { newScore ->
+			binding.scoreText.text = newScore.toString()
+		})
+		viewModel.word.observe(viewLifecycleOwner, { newWord ->
+			binding.wordText.text = newWord
+		})
 	}
 	
 	private fun setupListeners() {
