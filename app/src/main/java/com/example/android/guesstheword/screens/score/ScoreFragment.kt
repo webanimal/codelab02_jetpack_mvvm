@@ -16,13 +16,17 @@
 
 package com.example.android.guesstheword.screens.score
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.ScoreFragmentBinding
 import com.example.android.guesstheword.screens.core.MyViewModelFactory
@@ -36,11 +40,17 @@ class ScoreFragment : Fragment() {
 	private lateinit var binding: ScoreFragmentBinding
 	private lateinit var viewModel: ScoreViewModel
 	
+	override fun onAttach(context: Context) {
+		Log.i(TAG, "LIFECYCLE::onAttach")
+		super.onAttach(context)
+	}
+	
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
+		Log.i(TAG, "LIFECYCLE::onCreateView")
 		
 		binding = DataBindingUtil.inflate(
 			inflater,
@@ -48,9 +58,26 @@ class ScoreFragment : Fragment() {
 			container,
 			false
 		)
+		setupListeners()
 		setupViewModel(ScoreFragmentArgs.fromBundle(requireArguments()).score)
 		
 		return binding.root
+	}
+	
+	override fun onDetach() {
+		Log.i(TAG, "LIFECYCLE::onDetach")
+		super.onDetach()
+	}
+	
+	private fun playAgain() {
+		Log.i(TAG, "LIFECYCLE::playAgain")
+		viewModel.onPlayAgainComplete()
+		Toast.makeText(activity, "Restart", Toast.LENGTH_SHORT).show()
+		findNavController().navigate(ScoreFragmentDirections.actionRestart())
+	}
+	
+	private fun setupListeners() {
+		binding.playAgainButton.setOnClickListener { viewModel.onPlayAgain() }
 	}
 	
 	private fun setupViewModel(score: Int) {
@@ -58,6 +85,9 @@ class ScoreFragment : Fragment() {
 			.get(ScoreViewModel::class.java)
 		viewModel.score.observe(viewLifecycleOwner, { finalScore ->
 			binding.scoreText.text = finalScore.toString()
+		})
+		viewModel.eventPlayAgain.observe(viewLifecycleOwner, { isPlayAgain ->
+			if (isPlayAgain) playAgain()
 		})
 	}
 }

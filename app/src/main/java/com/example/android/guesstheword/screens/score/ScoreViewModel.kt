@@ -11,6 +11,10 @@ class ScoreViewModel(finalScore: Int) : ViewModel() {
 	val score: LiveData<Int>
 		get() = _score
 	
+	private val _eventPlayAgain = MutableLiveData<Boolean>()
+	val eventPlayAgain: LiveData<Boolean>
+		get() = _eventPlayAgain
+	
 	private val TAG = ScoreViewModel::class.java.simpleName
 	
 	init {
@@ -21,5 +25,13 @@ class ScoreViewModel(finalScore: Int) : ViewModel() {
 	override fun onCleared() {
 		Log.i(TAG, "LIFECYCLE::onCleared")
 		super.onCleared()
+	}
+	
+	fun onPlayAgain() {
+		_eventPlayAgain.value = true
+	}
+	
+	fun onPlayAgainComplete() {
+		_eventPlayAgain.value = false
 	}
 }

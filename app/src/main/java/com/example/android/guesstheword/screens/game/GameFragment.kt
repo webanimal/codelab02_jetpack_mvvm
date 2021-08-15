@@ -110,7 +110,6 @@ class GameFragment : Fragment() {
 			binding.wordText.text = newWord
 		})
 		viewModel.eventGameFinished.observe(viewLifecycleOwner, { isFinished ->
-			Log.i(TAG, "LIFECYCLE::setupViewModel isFinished:$isFinished")
 			if (isFinished) finishGame()
 		})
 	}
