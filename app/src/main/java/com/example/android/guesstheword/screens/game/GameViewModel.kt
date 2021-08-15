@@ -1,5 +1,6 @@
 package com.example.android.guesstheword.screens.game
 
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,11 +20,17 @@ class GameViewModel : ViewModel() {
 	val eventGameFinished: LiveData<Boolean>
 		get() = _eventGameFinished
 	
+	private val _currentCountdownTime = MutableLiveData<Long>()
+	val currentCountdownTime: LiveData<Long>
+		get() = _currentCountdownTime
+	
 	private val TAG = GameViewModel::class.java.simpleName
+	private lateinit var countDownTimer: CountDownTimer
 	private lateinit var wordList: MutableList<String>
 	
 	init {
 		Log.i(TAG, "LIFECYCLE::init")
+		initCountdownTimer()
 		resetList()
 		nextWord()
 		_score.value = 0
@@ -31,6 +38,8 @@ class GameViewModel : ViewModel() {
 	
 	override fun onCleared() {
 		Log.i(TAG, "LIFECYCLE::onCleared")
+		countDownTimer.cancel()
+		
 		super.onCleared()
 	}
 	
@@ -49,6 +58,37 @@ class GameViewModel : ViewModel() {
 		_eventGameFinished.value = false
 	}
 	// endregion
+	
+	/**
+	 * Moves to the next word in the list
+	 */
+	private fun nextWord() {
+		if (wordList.isNotEmpty()) {
+			//Select and remove a word from the list
+			_word.value = wordList.removeAt(0)
+			
+		} else {
+			resetList()
+		}
+	}
+	
+	private fun onGameFinish() {
+		_eventGameFinished.value = true
+	}
+	
+	private fun initCountdownTimer() {
+		countDownTimer = object : CountDownTimer(COUNTDOWN_TIME, ONE_SECOND) {
+			override fun onTick(millisUntilFinished: Long) {
+				_currentCountdownTime.value = millisUntilFinished / ONE_SECOND
+			}
+			
+			override fun onFinish() {
+				_currentCountdownTime.value = DONE
+				onGameFinish()
+			}
+		}
+		countDownTimer.start()
+	}
 	
 	/**
 	 * Resets the list of words and randomizes the order
@@ -80,20 +120,14 @@ class GameViewModel : ViewModel() {
 		wordList.shuffle()
 	}
 	
-	/**
-	 * Moves to the next word in the list
-	 */
-	private fun nextWord() {
-		if (wordList.isNotEmpty()) {
-			//Select and remove a word from the list
-			_word.value = wordList.removeAt(0)
-			
-		} else {
-			onGameFinished()
-		}
-	}
-	
-	private fun onGameFinished() {
-		_eventGameFinished.value = true
+	companion object {
+		// Time when the game is over
+		private const val DONE = 0L
+		
+		// Countdown time interval
+		private const val ONE_SECOND = 1000L
+		
+		// Total time for the game
+		private const val COUNTDOWN_TIME = 15000L
 	}
 }
