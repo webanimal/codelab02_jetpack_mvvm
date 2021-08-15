@@ -23,11 +23,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.ScoreFragmentBinding
 import com.example.android.guesstheword.screens.core.MyViewModelFactory
 
@@ -52,12 +50,7 @@ class ScoreFragment : Fragment() {
 	): View {
 		Log.i(TAG, "LIFECYCLE::onCreateView")
 		
-		binding = DataBindingUtil.inflate(
-			inflater,
-			R.layout.score_fragment,
-			container,
-			false
-		)
+		binding = ScoreFragmentBinding.inflate(inflater, container, false)
 		setupListeners()
 		setupViewModel(ScoreFragmentArgs.fromBundle(requireArguments()).score)
 		

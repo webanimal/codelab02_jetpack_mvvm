@@ -23,18 +23,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
 import com.example.android.guesstheword.screens.core.MyViewModelFactory
-
-/*
-* https://developer.android.com/codelabs/kotlin-android-training-live-data#6
-* https://medium.com/mobile-app-development-publication/injecting-viewmodel-with-dagger-hilt-54ca2e433865
-* */
 
 /**
  * Fragment where the game is played
@@ -57,12 +50,7 @@ class GameFragment : Fragment() {
 	): View {
 		Log.i(TAG, "LIFECYCLE::onCreateView")
 		
-		binding = DataBindingUtil.inflate(
-			inflater,
-			R.layout.game_fragment,
-			container,
-			false
-		)
+		binding = GameFragmentBinding.inflate(inflater, container, false)
 		setupViewModel()
 		setupListeners()
 		
