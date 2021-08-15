@@ -112,6 +112,9 @@ class GameFragment : Fragment() {
 		viewModel.eventGameFinished.observe(viewLifecycleOwner, { isFinished ->
 			if (isFinished) finishGame()
 		})
+		viewModel.currentCountdownTimeString.observe(viewLifecycleOwner, { countDownTimer ->
+			binding.timerText.text = countDownTimer
+		})
 	}
 	
 	private fun setupListeners() {
