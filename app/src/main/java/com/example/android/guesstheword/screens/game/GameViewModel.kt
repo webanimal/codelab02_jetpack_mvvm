@@ -10,9 +10,14 @@ class GameViewModel : ViewModel() {
 	private val _word = MutableLiveData<String>()
 	val word: LiveData<String>
 		get() = _word
+	
 	private val _score = MutableLiveData<Int>()
 	val score: LiveData<Int>
 		get() = _score
+	
+	private val _eventGameFinished = MutableLiveData<Boolean>()
+	val eventGameFinished: LiveData<Boolean>
+		get() = _eventGameFinished
 	
 	private val TAG = GameViewModel::class.java.simpleName
 	private lateinit var wordList: MutableList<String>
@@ -38,6 +43,10 @@ class GameViewModel : ViewModel() {
 	fun onCorrect() {
 		_score.value = (_score.value)?.plus(1)
 		nextWord()
+	}
+	
+	fun onGameFinishComplete() {
+		_eventGameFinished.value = false
 	}
 	// endregion
 	
@@ -78,6 +87,13 @@ class GameViewModel : ViewModel() {
 		if (!wordList.isEmpty()) {
 			//Select and remove a word from the list
 			_word.value = wordList.removeAt(0)
+			
+		} else {
+			onGameFinished()
 		}
+	}
+	
+	private fun onGameFinished() {
+		_eventGameFinished.value = true
 	}
 }

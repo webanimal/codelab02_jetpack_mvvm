@@ -33,6 +33,7 @@ import com.example.android.guesstheword.screens.core.MyViewModelFactory
 class ScoreFragment : Fragment() {
 	
 	private val TAG = ScoreFragment::class.java.simpleName
+	private lateinit var binding: ScoreFragmentBinding
 	private lateinit var viewModel: ScoreViewModel
 	
 	override fun onCreateView(
@@ -41,20 +42,22 @@ class ScoreFragment : Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 		
-		val binding: ScoreFragmentBinding = DataBindingUtil.inflate(
+		binding = DataBindingUtil.inflate(
 			inflater,
 			R.layout.score_fragment,
 			container,
 			false
 		)
-		val navArgsScore = ScoreFragmentArgs.fromBundle(requireArguments()).score
-		viewModel = ViewModelProvider(
-			this,
-			MyViewModelFactory(navArgsScore)
-		).get(ScoreViewModel::class.java)
-		
-		binding.scoreText.text = viewModel.score.toString()
+		setupViewModel(ScoreFragmentArgs.fromBundle(requireArguments()).score)
 		
 		return binding.root
+	}
+	
+	private fun setupViewModel(score: Int) {
+		viewModel = ViewModelProvider(this, MyViewModelFactory(score))
+			.get(ScoreViewModel::class.java)
+		viewModel.score.observe(viewLifecycleOwner, { finalScore ->
+			binding.scoreText.text = finalScore.toString()
+		})
 	}
 }

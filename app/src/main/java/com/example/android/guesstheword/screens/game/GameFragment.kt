@@ -32,7 +32,7 @@ import com.example.android.guesstheword.databinding.GameFragmentBinding
 import com.example.android.guesstheword.screens.core.MyViewModelFactory
 
 /*
-* https://developer.android.com/codelabs/kotlin-android-training-live-data#3
+* https://developer.android.com/codelabs/kotlin-android-training-live-data#6
 * https://medium.com/mobile-app-development-publication/injecting-viewmodel-with-dagger-hilt-54ca2e433865
 * */
 
@@ -91,6 +91,7 @@ class GameFragment : Fragment() {
 	// region Navigation
 	private fun finishGame() {
 		Log.i(TAG, "LIFECYCLE::finishGame finalScore:${viewModel.score}")
+		viewModel.onGameFinishComplete()
 		Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
 		GameFragmentDirections.actionGameToScore(score = viewModel.score.value ?: 0).let {
 			findNavController().navigate(it)
@@ -107,6 +108,10 @@ class GameFragment : Fragment() {
 		})
 		viewModel.word.observe(viewLifecycleOwner, { newWord ->
 			binding.wordText.text = newWord
+		})
+		viewModel.eventGameFinished.observe(viewLifecycleOwner, { isFinished ->
+			Log.i(TAG, "LIFECYCLE::setupViewModel isFinished:$isFinished")
+			if (isFinished) finishGame()
 		})
 	}
 	
