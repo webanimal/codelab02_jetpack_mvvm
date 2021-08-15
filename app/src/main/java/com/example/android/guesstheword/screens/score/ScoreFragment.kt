@@ -24,19 +24,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.android.guesstheword.databinding.ScoreFragmentBinding
-import com.example.android.guesstheword.screens.core.MyViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Fragment where the final score is shown, after the game is over
  */
+@AndroidEntryPoint
 class ScoreFragment : Fragment() {
 	
-	private val TAG = ScoreFragment::class.java.simpleName
 	private lateinit var binding: ScoreFragmentBinding
-	private lateinit var viewModel: ScoreViewModel
+	private val viewModel: ScoreViewModel by viewModels()
+	private val TAG = ScoreFragment::class.java.simpleName
 	
 	override fun onAttach(context: Context) {
 		Log.i(TAG, "LIFECYCLE::onAttach")
@@ -52,7 +53,7 @@ class ScoreFragment : Fragment() {
 		
 		binding = ScoreFragmentBinding.inflate(inflater, container, false)
 		setupListeners()
-		setupViewModel(ScoreFragmentArgs.fromBundle(requireArguments()).score)
+		setupViewModel()
 		
 		return binding.root
 	}
@@ -73,9 +74,7 @@ class ScoreFragment : Fragment() {
 		binding.playAgainButton.setOnClickListener { viewModel.onPlayAgain() }
 	}
 	
-	private fun setupViewModel(score: Int) {
-		viewModel = ViewModelProvider(this, MyViewModelFactory(score))
-			.get(ScoreViewModel::class.java)
+	private fun setupViewModel() {
 		viewModel.score.observe(viewLifecycleOwner, { finalScore ->
 			binding.scoreText.text = finalScore.toString()
 		})

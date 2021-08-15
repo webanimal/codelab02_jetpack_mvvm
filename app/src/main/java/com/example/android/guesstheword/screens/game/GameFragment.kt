@@ -24,19 +24,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.android.guesstheword.databinding.GameFragmentBinding
-import com.example.android.guesstheword.screens.core.MyViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Fragment where the game is played
  */
+@AndroidEntryPoint
 class GameFragment : Fragment() {
 	
-	private val TAG = GameFragment::class.java.simpleName
 	private lateinit var binding: GameFragmentBinding
-	private lateinit var viewModel: GameViewModel
+	private val viewModel: GameViewModel by viewModels()
+	private val TAG = GameFragment::class.java.simpleName
 	
 	override fun onAttach(context: Context) {
 		Log.i(TAG, "LIFECYCLE::onAttach")
@@ -62,7 +63,6 @@ class GameFragment : Fragment() {
 		super.onDetach()
 	}
 	
-	// region Methods for buttons presses
 	private fun onSkip() {
 		viewModel.onSkip()
 	}
@@ -74,9 +74,7 @@ class GameFragment : Fragment() {
 	private fun onEndGame() {
 		finishGame()
 	}
-	// endregion
 	
-	// region Navigation
 	private fun finishGame() {
 		Log.i(TAG, "LIFECYCLE::finishGame finalScore:${viewModel.score}")
 		viewModel.onGameFinishComplete()
@@ -85,12 +83,8 @@ class GameFragment : Fragment() {
 			findNavController().navigate(it)
 		}
 	}
-	// endregion
 	
-	// region Prepare view
 	private fun setupViewModel() {
-		viewModel = ViewModelProvider(this, MyViewModelFactory())
-			.get(GameViewModel::class.java)
 		viewModel.score.observe(viewLifecycleOwner, { newScore ->
 			binding.scoreText.text = newScore.toString()
 		})
@@ -100,7 +94,7 @@ class GameFragment : Fragment() {
 		viewModel.eventGameFinished.observe(viewLifecycleOwner, { isFinished ->
 			if (isFinished) finishGame()
 		})
-		viewModel.currentCountdownTimeString.observe(viewLifecycleOwner, { countDownTimer ->
+		viewModel.currentCountdownTimeString?.observe(viewLifecycleOwner, { countDownTimer ->
 			binding.timerText.text = countDownTimer
 		})
 	}
@@ -110,5 +104,4 @@ class GameFragment : Fragment() {
 		binding.correctButton.setOnClickListener { onCorrect() }
 		binding.endGameButton.setOnClickListener { onEndGame() }
 	}
-	// endregion
 }

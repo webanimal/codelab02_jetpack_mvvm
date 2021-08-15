@@ -7,8 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class GameViewModel : ViewModel() {
+@HiltViewModel
+class GameViewModel @Inject constructor(): ViewModel() {
 	
 	private val _word = MutableLiveData<String>()
 	val word: LiveData<String>
@@ -25,9 +28,10 @@ class GameViewModel : ViewModel() {
 	private val _currentCountdownTime = MutableLiveData<Long>()
 	private val currentCountdownTime: LiveData<Long>
 		get() = _currentCountdownTime
-	val currentCountdownTimeString = Transformations.map(currentCountdownTime) { time ->
-		DateUtils.formatElapsedTime(time)
-	}
+	val currentCountdownTimeString: LiveData<String>? =
+		Transformations.map(currentCountdownTime) { time ->
+			DateUtils.formatElapsedTime(time)
+		}
 	
 	private val TAG = GameViewModel::class.java.simpleName
 	private lateinit var countDownTimer: CountDownTimer
@@ -48,7 +52,6 @@ class GameViewModel : ViewModel() {
 		super.onCleared()
 	}
 	
-	// region Methods for buttons presses
 	fun onSkip() {
 		_score.value = (_score.value)?.minus(1)
 		nextWord()
@@ -62,7 +65,6 @@ class GameViewModel : ViewModel() {
 	fun onGameFinishComplete() {
 		_eventGameFinished.value = false
 	}
-	// endregion
 	
 	/**
 	 * Moves to the next word in the list
@@ -133,6 +135,6 @@ class GameViewModel : ViewModel() {
 		private const val ONE_SECOND = 1000L
 		
 		// Total time for the game
-		private const val COUNTDOWN_TIME = 15000L
+		private const val COUNTDOWN_TIME = 10000L
 	}
 }
